@@ -1,3 +1,10 @@
+## COPYRIGHT 2021, Octagoons, All Rights Reserved
+
+## Authors: Kevin Schubert, Zoila Rossi, Amber Jolly, Gavincko Alagesan
+
+## Usage of this script academically and professionally must be granted
+## permission by all authors.
+
 library(lubridate)
 
 S2D1 = read.csv("data/S2D1.csv")
@@ -64,8 +71,8 @@ df = rbind(S2D1, S2D2, S2D3)
 
 
 
-S3D1 = read.csv("data/S3D1.csv")
-S3D2 = read.csv("data/S3D2.csv")
+S3D1 = read.csv("data/S2D1.csv")
+S3D2 = read.csv("data/S2D2.csv")
 S3D3 = rbind(read.csv("data/S3D3.1.csv"), read.csv("data/S3D3.2.csv"), read.csv("data/S3D3.3.csv"))
 
 
