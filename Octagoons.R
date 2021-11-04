@@ -3622,7 +3622,7 @@ x2 <- model.matrix(lm(DR~permutation+immediate_action+recent_action+
                        BPS+BPD+HR+Breathing_Rate+cadence, df2))[,-1]
 
 y2 <- df2$DR
-lasso.mod2 <- glmnet(x,y,family="gaussian")
+lasso.mod2 <- glmnet(x2,y2,family="gaussian")
 plot(lasso.mod2, xvar="lambda")
 #print(lasso.mod2)
 
@@ -3641,11 +3641,11 @@ x3 <- model.matrix(lm(IR~permutation+immediate_action+recent_action+
                        BPS+BPD+HR+Breathing_Rate+cadence, df2))[,-1]
 
 y3 <- df2$IR
-lasso.mod3 <- glmnet(x,y,family="gaussian")
+lasso.mod3 <- glmnet(x3,y3,family="gaussian")
 plot(lasso.mod3, xvar="lambda")
 #print(lasso.mod3)
 
-cv.lasso3 <- cv.glmnet(x,y, nfolds=10)
+cv.lasso3 <- cv.glmnet(x3,y3, nfolds=10)
 plot(cv.lasso3)
 #print(cv.lasso)
 
