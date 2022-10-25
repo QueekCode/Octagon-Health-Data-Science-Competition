@@ -6,1694 +6,177 @@
 ## permission by all authors.
 
 library(lubridate)
-
-S2D1 = read.csv("data/S2D1.csv")
-S2D2 = read.csv("data/S2D2.csv")
-S2D3 = read.csv("data/S2D3.csv")
-
-
-S2D1$time..s. = hms(substr(S2D1$time..s., 12, 19))
-S2D1$day = 1
-S2D1$permutation = 2
-S2D1$session = 2
-S2D1$immediate_action = "Nothing"
-S2D1$recent_action = "Nothing"
-
-S2D3$time..s. = hms(substr(S2D3$time..s., 12, 19))
-S2D3$day = 3
-S2D3$permutation = 2
-S2D3$session = 2
-S2D3$immediate_action = "Nothing"
-S2D3$recent_action = "Nothing"
-
-S2D2$time..s. = hms(substr(S2D2$time..s., 12, 19))
-S2D2$day = 2
-S2D2$permutation = 2
-S2D2$session = 2
-S2D2$immediate_action = ifelse(
-  hms("09:00:00") <= S2D2$time..s. & 
-    hms("10:00:00") >= S2D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S2D2$time..s. & 
-      hms("16:00:00") >= S2D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S2D2$time..s. & 
-        hms("23:59:59") >= S2D2$time..s. ,
-      "Sugar",
-      "Nothing"
+df = NA
+tmp = NA
+for (name in list.files('./data/permutation1')){
+  tmp = read.csv(paste("data/permutation1/", name, sep = ''))
+  tmp$time..s. = hms(substr(tmp$time..s., 12, 19))
+  tmp$day = strtoi(strsplit(strsplit(name, 'D')[[1]][2], '[.]')[[1]][1]) #day
+  tmp$session = strtoi(substr(strsplit(name, 'D')[[1]][1], 2, 3)) # session
+  tmp$permutation = 1
+  if (tmp$day == 2){
+    tmp$immediate_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("10:00:00") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("16:00:00") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
     )
-  )
-)
-S2D2$recent_action = ifelse(
-  hms("09:00:00") <= S2D2$time..s. & 
-    hms("14:59:59") >= S2D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S2D2$time..s. & 
-      hms("22:59:59") >= S2D2$time..s. ,
-    "Aerobic Exercise",
     
-    ifelse(
-      hms("23:00:00") <= S2D2$time..s. & 
-        hms("23:59:59") >= S2D2$time..s. ,
-      "Sugar",
-      "Nothing"
+    tmp$recent_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("14:59:59") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("22:59:59") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
     )
-  )
-)
-
-df = rbind(S2D1, S2D2, S2D3)
-
-
-
-S3D1 = read.csv("data/S2D1.csv")
-S3D2 = read.csv("data/S2D2.csv")
-S3D3 = rbind(read.csv("data/S3D3.1.csv"), read.csv("data/S3D3.2.csv"), read.csv("data/S3D3.3.csv"))
-
-
-S3D1$time..s. = hms(substr(S3D1$time..s., 12, 19))
-S3D1$day = 1
-S3D1$permutation = 3
-S3D1$session = 3
-S3D1$immediate_action = "Nothing"
-S3D1$recent_action = "Nothing"
-
-S3D3$time..s. = hms(substr(S3D3$time..s., 12, 19))
-S3D3$day = 3
-S3D3$permutation = 3
-S3D3$session = 3
-S3D3$immediate_action = "Nothing"
-S3D3$recent_action = "Nothing"
-
-S3D2$time..s. = hms(substr(S3D2$time..s., 12, 19))
-S3D2$day = 2
-S3D2$permutation = 3
-S3D2$session = 3
-S3D2$immediate_action = ifelse(
-  hms("09:00:00") <= S3D2$time..s. & 
-    hms("10:00:00") >= S3D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S3D2$time..s. & 
-      hms("16:00:00") >= S3D2$time..s. ,
-    "Nothing",
     
-    ifelse(
-      hms("23:00:00") <= S3D2$time..s. & 
-        hms("23:59:59") >= S3D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S3D2$recent_action = ifelse(
-  hms("09:00:00") <= S3D2$time..s. & 
-    hms("14:59:59") >= S3D2$time..s. ,
-  "TV",
+  } else {
+    tmp$immediate_action = "Nothing"
+    tmp$recent_action = "Nothing"
+  }
   
-  ifelse(
-    hms("15:00:00") <= S3D2$time..s. & 
-      hms("22:59:59") >= S3D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S3D2$time..s. & 
-        hms("23:59:59") >= S3D2$time..s. ,
-      "Nothing",
-      "Nothing"
+  if (is.na(df)){
+    df = tmp
+  } else {
+    df = rbind(df, tmp)
+  }
+}
+for (name in list.files('./data/permutation2')){
+  tmp = read.csv(paste("data/permutation2/", name, sep = ''))
+  tmp$time..s. = hms(substr(tmp$time..s., 12, 19))
+  tmp$day = strtoi(strsplit(strsplit(name, 'D')[[1]][2], '[.]')[[1]][1]) #day
+  tmp$session = strtoi(substr(strsplit(name, 'D')[[1]][1], 2, 3)) # session
+  tmp$permutation = 2
+  if (tmp$day == 2){
+    tmp$immediate_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("10:00:00") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("16:00:00") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
     )
-  )
-)
-
-df = rbind(df, S3D1, S3D2, S3D3)
-
-
-
-S4D1 = read.csv("data/S4D1.csv")
-S4D2 = read.csv("data/S4D2.csv")
-S4D3 = read.csv("data/S4D3.csv")
-
-
-S4D1$time..s. = hms(substr(S4D1$time..s., 12, 19))
-S4D1$day = 1
-S4D1$permutation = 1
-S4D1$session = 4
-S4D1$immediate_action = "Nothing"
-S4D1$recent_action = "Nothing"
-
-S4D3$time..s. = hms(substr(S4D3$time..s., 12, 19))
-S4D3$day = 3
-S4D3$permutation = 1
-S4D3$session = 4
-S4D3$immediate_action = "Nothing"
-S4D3$recent_action = "Nothing"
-
-S4D2$time..s. = hms(substr(S4D2$time..s., 12, 19))
-S4D2$day = 2
-S4D2$permutation = 1
-S4D2$session = 4
-S4D2$immediate_action = ifelse(
-  hms("09:00:00") <= S4D2$time..s. & 
-    hms("10:00:00") >= S4D2$time..s. ,
-  "TV",
+    
+    tmp$recent_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("14:59:59") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("22:59:59") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
+    )
+    
+  } else {
+    tmp$immediate_action = "Nothing"
+    tmp$recent_action = "Nothing"
+  }
   
-  ifelse(
-    hms("15:00:00") <= S4D2$time..s. & 
-      hms("16:00:00") >= S4D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S4D2$time..s. & 
-        hms("23:59:59") >= S4D2$time..s. ,
-      "Sugar",
-      "Nothing"
+  if (is.na(df)){
+    df = tmp
+  } else {
+    df = rbind(df, tmp)
+  }
+}
+
+for (name in list.files('./data/permutation3')){
+  tmp = read.csv(paste("data/permutation3/", name, sep = ''))
+  tmp$time..s. = hms(substr(tmp$time..s., 12, 19))
+  tmp$day = strtoi(strsplit(strsplit(name, 'D')[[1]][2], '[.]')[[1]][1]) #day
+  tmp$session = strtoi(substr(strsplit(name, 'D')[[1]][1], 2, 3)) # session
+  tmp$permutation = 3
+  if (tmp$day == 2){
+    tmp$immediate_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("10:00:00") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("16:00:00") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
     )
-  )
-)
-S4D2$recent_action = ifelse(
-  hms("09:00:00") <= S4D2$time..s. & 
-    hms("14:59:59") >= S4D2$time..s. ,
-  "TV",
+    
+    tmp$recent_action = ifelse(
+      hms("09:00:00") <= tmp$time..s. & 
+        hms("14:59:59") >= tmp$time..s. ,
+      "Reading",
+      
+      ifelse(
+        hms("15:00:00") <= tmp$time..s. & 
+          hms("22:59:59") >= tmp$time..s. ,
+        "Aerobic Exercise",
+        
+        ifelse(
+          hms("23:00:00") <= tmp$time..s. & 
+            hms("23:59:59") >= tmp$time..s. ,
+          "Sugar",
+          "Nothing"
+        )
+      )
+    )
+    
+  } else {
+    tmp$immediate_action = "Nothing"
+    tmp$recent_action = "Nothing"
+  }
   
-  ifelse(
-    hms("15:00:00") <= S4D2$time..s. & 
-      hms("22:59:59") >= S4D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S4D2$time..s. & 
-        hms("23:59:59") >= S4D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S4D1, S4D2, S4D3)
-
-S5D1 = read.csv("data/S5D1.csv")
-S5D2 = read.csv("data/S5D2.csv")
-S5D3 = read.csv("data/S5D3.csv")
-
-
-S5D1$time..s. = hms(substr(S5D1$time..s., 12, 19))
-S5D1$day = 1
-S5D1$permutation = 2
-S5D1$session = 5
-S5D1$immediate_action = "Nothing"
-S5D1$recent_action = "Nothing"
-
-S5D3$time..s. = hms(substr(S5D3$time..s., 12, 19))
-S5D3$day = 3
-S5D3$permutation = 2
-S5D3$session = 5
-S5D3$immediate_action = "Nothing"
-S5D3$recent_action = "Nothing"
-
-S5D2$time..s. = hms(substr(S5D2$time..s., 12, 19))
-S5D2$day = 2
-S5D2$permutation = 2
-S5D2$session = 5
-S5D2$immediate_action = ifelse(
-  hms("09:00:00") <= S5D2$time..s. & 
-    hms("10:00:00") >= S5D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S5D2$time..s. & 
-      hms("16:00:00") >= S5D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S5D2$time..s. & 
-        hms("23:59:59") >= S5D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S5D2$recent_action = ifelse(
-  hms("09:00:00") <= S5D2$time..s. & 
-    hms("14:59:59") >= S5D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S5D2$time..s. & 
-      hms("22:59:59") >= S5D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S5D2$time..s. & 
-        hms("23:59:59") >= S5D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S5D1, S5D2, S5D3)
-
-
-S6D1 = read.csv("data/S6D1.csv")
-S6D2 = read.csv("data/S6D2.csv")
-S6D3 = read.csv("data/S6D3.csv")
-
-
-S6D1$time..s. = hms(substr(S6D1$time..s., 12, 19))
-S6D1$day = 1
-S6D1$permutation = 3
-S6D1$session = 6
-S6D1$immediate_action = "Nothing"
-S6D1$recent_action = "Nothing"
-
-S6D3$time..s. = hms(substr(S6D3$time..s., 12, 19))
-S6D3$day = 3
-S6D3$permutation = 3
-S6D3$session = 6
-S6D3$immediate_action = "Nothing"
-S6D3$recent_action = "Nothing"
-
-S6D2$time..s. = hms(substr(S6D2$time..s., 12, 19))
-S6D2$day = 2
-S6D2$permutation = 3
-S6D2$session = 6
-S6D2$immediate_action = ifelse(
-  hms("09:00:00") <= S6D2$time..s. & 
-    hms("10:00:00") >= S6D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S6D2$time..s. & 
-      hms("16:00:00") >= S6D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S6D2$time..s. & 
-        hms("23:59:59") >= S6D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S6D2$recent_action = ifelse(
-  hms("09:00:00") <= S6D2$time..s. & 
-    hms("14:59:59") >= S6D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S6D2$time..s. & 
-      hms("22:59:59") >= S6D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S6D2$time..s. & 
-        hms("23:59:59") >= S6D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S6D1, S6D2, S6D3)
-
-S7D1 = read.csv("data/S7D1.csv")
-S7D2 = read.csv("data/S7D2.csv")
-S7D3 = read.csv("data/S7D3.csv")
-
-
-S7D1$time..s. = hms(substr(S7D1$time..s., 12, 19))
-S7D1$day = 1
-S7D1$permutation = 1
-S7D1$session = 7
-S7D1$immediate_action = "Nothing"
-S7D1$recent_action = "Nothing"
-
-S7D3$time..s. = hms(substr(S7D3$time..s., 12, 19))
-S7D3$day = 3
-S7D3$permutation = 1
-S7D3$session = 7
-S7D3$immediate_action = "Nothing"
-S7D3$recent_action = "Nothing"
-
-S7D2$time..s. = hms(substr(S7D2$time..s., 12, 19))
-S7D2$day = 2
-S7D2$permutation = 1
-S7D2$session = 7
-S7D2$immediate_action = ifelse(
-  hms("09:00:00") <= S7D2$time..s. & 
-    hms("10:00:00") >= S7D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S7D2$time..s. & 
-      hms("16:00:00") >= S7D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S7D2$time..s. & 
-        hms("23:59:59") >= S7D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S7D2$recent_action = ifelse(
-  hms("09:00:00") <= S7D2$time..s. & 
-    hms("14:59:59") >= S7D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S7D2$time..s. & 
-      hms("22:59:59") >= S7D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S7D2$time..s. & 
-        hms("23:59:59") >= S7D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S7D1, S7D2, S7D3)
-
-
-S8D1 = read.csv("data/S8D1.csv")
-S8D2 = read.csv("data/S8D2.csv")
-S8D3 = read.csv("data/S8D3.csv")
-
-
-S8D1$time..s. = hms(substr(S8D1$time..s., 12, 19))
-S8D1$day = 1
-S8D1$permutation = 2
-S8D1$session = 8
-S8D1$immediate_action = "Nothing"
-S8D1$recent_action = "Nothing"
-
-S8D3$time..s. = hms(substr(S8D3$time..s., 12, 19))
-S8D3$day = 3
-S8D3$permutation = 2
-S8D3$session = 8
-S8D3$immediate_action = "Nothing"
-S8D3$recent_action = "Nothing"
-
-S8D2$time..s. = hms(substr(S8D2$time..s., 12, 19))
-S8D2$day = 2
-S8D2$permutation = 2
-S8D2$session = 8
-S8D2$immediate_action = ifelse(
-  hms("09:00:00") <= S8D2$time..s. & 
-    hms("10:00:00") >= S8D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S8D2$time..s. & 
-      hms("16:00:00") >= S8D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S8D2$time..s. & 
-        hms("23:59:59") >= S8D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S8D2$recent_action = ifelse(
-  hms("09:00:00") <= S8D2$time..s. & 
-    hms("14:59:59") >= S8D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S8D2$time..s. & 
-      hms("22:59:59") >= S8D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S8D2$time..s. & 
-        hms("23:59:59") >= S8D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S8D1, S8D2, S8D3)
-
-
-S9D1 = read.csv("data/S9D1.csv")
-S9D2 = read.csv("data/S9D2.csv")
-S9D3 = read.csv("data/S9D3.csv")
-
-
-S9D1$time..s. = hms(substr(S9D1$time..s., 12, 19))
-S9D1$day = 1
-S9D1$permutation = 3
-S9D1$session = 9
-S9D1$immediate_action = "Nothing"
-S9D1$recent_action = "Nothing"
-
-S9D3$time..s. = hms(substr(S9D3$time..s., 12, 19))
-S9D3$day = 3
-S9D3$permutation = 3
-S9D3$session = 9
-S9D3$immediate_action = "Nothing"
-S9D3$recent_action = "Nothing"
-
-S9D2$time..s. = hms(substr(S9D2$time..s., 12, 19))
-S9D2$day = 2
-S9D2$permutation = 3
-S9D2$session = 9
-S9D2$immediate_action = ifelse(
-  hms("09:00:00") <= S9D2$time..s. & 
-    hms("10:00:00") >= S9D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S9D2$time..s. & 
-      hms("16:00:00") >= S9D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S9D2$time..s. & 
-        hms("23:59:59") >= S9D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S9D2$recent_action = ifelse(
-  hms("09:00:00") <= S9D2$time..s. & 
-    hms("14:59:59") >= S9D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S9D2$time..s. & 
-      hms("22:59:59") >= S9D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S9D2$time..s. & 
-        hms("23:59:59") >= S9D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S9D1, S9D2, S9D3)
-
-
-
-
-
-
-
-### yayyyy missing csvs
-S10D3 = read.csv("data/S10D3.csv")
-
-S10D3$time..s. = hms(substr(S10D3$time..s., 12, 19))
-S10D3$day = 3
-S10D3$permutation = 1
-S10D3$session = 10
-S10D3$immediate_action = "Nothing"
-S10D3$recent_action = "Nothing"
-
-
-df = rbind(df, S10D3)
-
-S11D1 = read.csv("data/S11D1.csv")
-S11D2 = read.csv("data/S11D2.csv")
-S11D3 = read.csv("data/S11D3.csv")
-
-
-S11D1$time..s. = hms(substr(S11D1$time..s., 12, 19))
-S11D1$day = 1
-S11D1$permutation = 2
-S11D1$session = 11
-S11D1$immediate_action = "Nothing"
-S11D1$recent_action = "Nothing"
-
-S11D3$time..s. = hms(substr(S11D3$time..s., 12, 19))
-S11D3$day = 3
-S11D3$permutation = 2
-S11D3$session = 11
-S11D3$immediate_action = "Nothing"
-S11D3$recent_action = "Nothing"
-
-S11D2$time..s. = hms(substr(S11D2$time..s., 12, 19))
-S11D2$day = 2
-S11D2$permutation = 2
-S11D2$session = 5
-S11D2$immediate_action = ifelse(
-  hms("09:00:00") <= S11D2$time..s. & 
-    hms("10:00:00") >= S11D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S11D2$time..s. & 
-      hms("16:00:00") >= S11D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S11D2$time..s. & 
-        hms("23:59:59") >= S11D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S11D2$recent_action = ifelse(
-  hms("09:00:00") <= S11D2$time..s. & 
-    hms("14:59:59") >= S11D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S11D2$time..s. & 
-      hms("22:59:59") >= S11D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S11D2$time..s. & 
-        hms("23:59:59") >= S11D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S11D1, S11D2, S11D3)
-
-
-S12D1 = read.csv("data/S12D1.csv")
-#WEEEEEEEEEEEEEEEEEEE
-S12D3 = read.csv("data/S12D3.csv")
-
-
-S12D1$time..s. = hms(substr(S12D1$time..s., 12, 19))
-S12D1$day = 1
-S12D1$permutation = 3
-S12D1$session = 12
-S12D1$immediate_action = "Nothing"
-S12D1$recent_action = "Nothing"
-
-S12D3$time..s. = hms(substr(S12D3$time..s., 12, 19))
-S12D3$day = 3
-S12D3$permutation = 3
-S12D3$session = 12
-S12D3$immediate_action = "Nothing"
-S12D3$recent_action = "Nothing"
-
-
-df = rbind(df, S12D1, S12D3)
-
-
-
-
-S13D1 = read.csv("data/S13D1.csv")
-S13D2 = read.csv("data/S13D2.csv")
-S13D3 = read.csv("data/S13D3.csv")
-
-
-S13D1$time..s. = hms(substr(S13D1$time..s., 12, 19))
-S13D1$day = 1
-S13D1$permutation = 1
-S13D1$session = 13
-S13D1$immediate_action = "Nothing"
-S13D1$recent_action = "Nothing"
-
-S13D3$time..s. = hms(substr(S13D3$time..s., 12, 19))
-S13D3$day = 3
-S13D3$permutation = 1
-S13D3$session = 13
-S13D3$immediate_action = "Nothing"
-S13D3$recent_action = "Nothing"
-
-S13D2$time..s. = hms(substr(S13D2$time..s., 12, 19))
-S13D2$day = 2
-S13D2$permutation = 1
-S13D2$session = 13
-S13D2$immediate_action = ifelse(
-  hms("09:00:00") <= S13D2$time..s. & 
-    hms("10:00:00") >= S13D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S13D2$time..s. & 
-      hms("16:00:00") >= S13D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S13D2$time..s. & 
-        hms("23:59:59") >= S13D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S13D2$recent_action = ifelse(
-  hms("09:00:00") <= S13D2$time..s. & 
-    hms("14:59:59") >= S13D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S13D2$time..s. & 
-      hms("22:59:59") >= S13D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S13D2$time..s. & 
-        hms("23:59:59") >= S13D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S13D1, S13D2, S13D3)
-
-S14D1 = read.csv("data/S14D1.csv")
-S14D2 = read.csv("data/S14D2.csv")
-S14D3 = read.csv("data/S14D3.csv")
-
-
-S14D1$time..s. = hms(substr(S14D1$time..s., 12, 19))
-S14D1$day = 1
-S14D1$permutation = 2
-S14D1$session = 14
-S14D1$immediate_action = "Nothing"
-S14D1$recent_action = "Nothing"
-
-S14D3$time..s. = hms(substr(S14D3$time..s., 12, 19))
-S14D3$day = 3
-S14D3$permutation = 2
-S14D3$session = 14
-S14D3$immediate_action = "Nothing"
-S14D3$recent_action = "Nothing"
-
-S14D2$time..s. = hms(substr(S14D2$time..s., 12, 19))
-S14D2$day = 2
-S14D2$permutation = 2
-S14D2$session = 14
-S14D2$immediate_action = ifelse(
-  hms("09:00:00") <= S14D2$time..s. & 
-    hms("10:00:00") >= S14D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S14D2$time..s. & 
-      hms("16:00:00") >= S14D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S14D2$time..s. & 
-        hms("23:59:59") >= S14D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S14D2$recent_action = ifelse(
-  hms("09:00:00") <= S14D2$time..s. & 
-    hms("14:59:59") >= S14D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S14D2$time..s. & 
-      hms("22:59:59") >= S14D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S14D2$time..s. & 
-        hms("23:59:59") >= S14D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S14D1, S14D2, S14D3)
-
-
-S15D1 = read.csv("data/S15D1.csv")
-S15D2 = read.csv("data/S15D2.csv")
-S15D3 = read.csv("data/S15D3.csv")
-
-
-S15D1$time..s. = hms(substr(S15D1$time..s., 12, 19))
-S15D1$day = 1
-S15D1$permutation = 3
-S15D1$session = 15
-S15D1$immediate_action = "Nothing"
-S15D1$recent_action = "Nothing"
-
-S15D3$time..s. = hms(substr(S15D3$time..s., 12, 19))
-S15D3$day = 3
-S15D3$permutation = 3
-S15D3$session = 15
-S15D3$immediate_action = "Nothing"
-S15D3$recent_action = "Nothing"
-
-S15D2$time..s. = hms(substr(S15D2$time..s., 12, 19))
-S15D2$day = 2
-S15D2$permutation = 3
-S15D2$session = 15
-S15D2$immediate_action = ifelse(
-  hms("09:00:00") <= S15D2$time..s. & 
-    hms("10:00:00") >= S15D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S15D2$time..s. & 
-      hms("16:00:00") >= S15D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S15D2$time..s. & 
-        hms("23:59:59") >= S15D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S15D2$recent_action = ifelse(
-  hms("09:00:00") <= S15D2$time..s. & 
-    hms("14:59:59") >= S15D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S15D2$time..s. & 
-      hms("22:59:59") >= S15D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S15D2$time..s. & 
-        hms("23:59:59") >= S15D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S15D1, S15D2, S15D3)
-
-
-
-
-
-
-
-
-#you think this is funny?
-S16D2 = read.csv("data/S16D2.csv")
-S16D3 = read.csv("data/S16D3.csv")
-
-
-S16D3$time..s. = hms(substr(S16D3$time..s., 12, 19))
-S16D3$day = 3
-S16D3$permutation = 1
-S16D3$session = 16
-S16D3$immediate_action = "Nothing"
-S16D3$recent_action = "Nothing"
-
-S16D2$time..s. = hms(substr(S16D2$time..s., 12, 19))
-S16D2$day = 2
-S16D2$permutation = 1
-S16D2$session = 16
-S16D2$immediate_action = ifelse(
-  hms("09:00:00") <= S16D2$time..s. & 
-    hms("10:00:00") >= S16D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S16D2$time..s. & 
-      hms("16:00:00") >= S16D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S16D2$time..s. & 
-        hms("23:59:59") >= S16D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S16D2$recent_action = ifelse(
-  hms("09:00:00") <= S16D2$time..s. & 
-    hms("14:59:59") >= S16D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S16D2$time..s. & 
-      hms("22:59:59") >= S16D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S16D2$time..s. & 
-        hms("23:59:59") >= S16D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S16D2, S16D3)
-
-S17D1 = read.csv("data/S17D1.csv")
-S17D2 = read.csv("data/S17D2.csv")
-S17D3 = read.csv("data/S17D3.csv")
-
-
-S17D1$time..s. = hms(substr(S17D1$time..s., 12, 19))
-S17D1$day = 1
-S17D1$permutation = 2
-S17D1$session = 17
-S17D1$immediate_action = "Nothing"
-S17D1$recent_action = "Nothing"
-
-S17D3$time..s. = hms(substr(S17D3$time..s., 12, 19))
-S17D3$day = 3
-S17D3$permutation = 2
-S17D3$session = 17
-S17D3$immediate_action = "Nothing"
-S17D3$recent_action = "Nothing"
-
-S17D2$time..s. = hms(substr(S17D2$time..s., 12, 19))
-S17D2$day = 2
-S17D2$permutation = 2
-S17D2$session = 17
-S17D2$immediate_action = ifelse(
-  hms("09:00:00") <= S17D2$time..s. & 
-    hms("10:00:00") >= S17D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S17D2$time..s. & 
-      hms("16:00:00") >= S17D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S17D2$time..s. & 
-        hms("23:59:59") >= S17D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S17D2$recent_action = ifelse(
-  hms("09:00:00") <= S17D2$time..s. & 
-    hms("14:59:59") >= S17D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S17D2$time..s. & 
-      hms("22:59:59") >= S17D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S17D2$time..s. & 
-        hms("23:59:59") >= S17D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S17D1, S17D2, S17D3)
-
-
-S18D1 = read.csv("data/S18D1.csv")
-S18D2 = read.csv("data/S18D2.csv")
-S18D3 = read.csv("data/S18D3.csv")
-
-
-S18D1$time..s. = hms(substr(S18D1$time..s., 12, 19))
-S18D1$day = 1
-S18D1$permutation = 3
-S18D1$session = 18
-S18D1$immediate_action = "Nothing"
-S18D1$recent_action = "Nothing"
-
-S18D3$time..s. = hms(substr(S18D3$time..s., 12, 19))
-S18D3$day = 3
-S18D3$permutation = 3
-S18D3$session = 18
-S18D3$immediate_action = "Nothing"
-S18D3$recent_action = "Nothing"
-
-S18D2$time..s. = hms(substr(S18D2$time..s., 12, 19))
-S18D2$day = 2
-S18D2$permutation = 3
-S18D2$session = 18
-S18D2$immediate_action = ifelse(
-  hms("09:00:00") <= S18D2$time..s. & 
-    hms("10:00:00") >= S18D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S18D2$time..s. & 
-      hms("16:00:00") >= S18D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S18D2$time..s. & 
-        hms("23:59:59") >= S18D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S18D2$recent_action = ifelse(
-  hms("09:00:00") <= S18D2$time..s. & 
-    hms("14:59:59") >= S18D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S18D2$time..s. & 
-      hms("22:59:59") >= S18D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S18D2$time..s. & 
-        hms("23:59:59") >= S18D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S18D1, S18D2, S18D3)
-
-
-S19D1 = read.csv("data/S19D1.csv")
-S19D2 = read.csv("data/S19D2.csv")
-S19D3 = read.csv("data/S19D3.csv")
-
-
-S19D1$time..s. = hms(substr(S19D1$time..s., 12, 19))
-S19D1$day = 1
-S19D1$permutation = 1
-S19D1$session = 19
-S19D1$immediate_action = "Nothing"
-S19D1$recent_action = "Nothing"
-
-S19D3$time..s. = hms(substr(S19D3$time..s., 12, 19))
-S19D3$day = 3
-S19D3$permutation = 1
-S19D3$session = 19
-S19D3$immediate_action = "Nothing"
-S19D3$recent_action = "Nothing"
-
-S19D2$time..s. = hms(substr(S19D2$time..s., 12, 19))
-S19D2$day = 2
-S19D2$permutation = 1
-S19D2$session = 19
-S19D2$immediate_action = ifelse(
-  hms("09:00:00") <= S19D2$time..s. & 
-    hms("10:00:00") >= S19D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S19D2$time..s. & 
-      hms("16:00:00") >= S19D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S19D2$time..s. & 
-        hms("23:59:59") >= S19D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S19D2$recent_action = ifelse(
-  hms("09:00:00") <= S19D2$time..s. & 
-    hms("14:59:59") >= S19D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S19D2$time..s. & 
-      hms("22:59:59") >= S19D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S19D2$time..s. & 
-        hms("23:59:59") >= S19D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S19D1, S19D2, S19D3)
-
-S20D1 = read.csv("data/S20D1.csv")
-S20D2 = read.csv("data/S20D2.csv")
-S20D3 = read.csv("data/S20D3.csv")
-
-
-S20D1$time..s. = hms(substr(S20D1$time..s., 12, 19))
-S20D1$day = 1
-S20D1$permutation = 2
-S20D1$session = 20
-S20D1$immediate_action = "Nothing"
-S20D1$recent_action = "Nothing"
-
-S20D3$time..s. = hms(substr(S20D3$time..s., 12, 19))
-S20D3$day = 3
-S20D3$permutation = 2
-S20D3$session = 20
-S20D3$immediate_action = "Nothing"
-S20D3$recent_action = "Nothing"
-
-S20D2$time..s. = hms(substr(S20D2$time..s., 12, 19))
-S20D2$day = 2
-S20D2$permutation = 2
-S20D2$session = 20
-S20D2$immediate_action = ifelse(
-  hms("09:00:00") <= S20D2$time..s. & 
-    hms("10:00:00") >= S20D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S20D2$time..s. & 
-      hms("16:00:00") >= S20D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S20D2$time..s. & 
-        hms("23:59:59") >= S20D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S20D2$recent_action = ifelse(
-  hms("09:00:00") <= S20D2$time..s. & 
-    hms("14:59:59") >= S20D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S20D2$time..s. & 
-      hms("22:59:59") >= S20D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S20D2$time..s. & 
-        hms("23:59:59") >= S20D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S20D1, S20D2, S20D3)
-
-
-S21D1 = read.csv("data/S21D1.csv")
-S21D2 = read.csv("data/S21D2.csv")
-S21D3 = read.csv("data/S21D3.csv")
-
-
-S21D1$time..s. = hms(substr(S21D1$time..s., 12, 19))
-S21D1$day = 1
-S21D1$permutation = 3
-S21D1$session = 21
-S21D1$immediate_action = "Nothing"
-S21D1$recent_action = "Nothing"
-
-S21D3$time..s. = hms(substr(S21D3$time..s., 12, 19))
-S21D3$day = 3
-S21D3$permutation = 3
-S21D3$session = 21
-S21D3$immediate_action = "Nothing"
-S21D3$recent_action = "Nothing"
-
-S21D2$time..s. = hms(substr(S21D2$time..s., 12, 19))
-S21D2$day = 2
-S21D2$permutation = 3
-S21D2$session = 21
-S21D2$immediate_action = ifelse(
-  hms("09:00:00") <= S21D2$time..s. & 
-    hms("10:00:00") >= S21D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S21D2$time..s. & 
-      hms("16:00:00") >= S21D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S21D2$time..s. & 
-        hms("23:59:59") >= S21D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S21D2$recent_action = ifelse(
-  hms("09:00:00") <= S21D2$time..s. & 
-    hms("14:59:59") >= S21D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S21D2$time..s. & 
-      hms("22:59:59") >= S21D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S21D2$time..s. & 
-        hms("23:59:59") >= S21D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S21D1, S21D2, S21D3)
-
-
-
-S22D1 = read.csv("data/S22D1.csv")
-S22D2 = read.csv("data/S22D2.csv")
-S22D3 = read.csv("data/S22D3.csv")
-
-
-S22D1$time..s. = hms(substr(S22D1$time..s., 12, 19))
-S22D1$day = 1
-S22D1$permutation = 1
-S22D1$session = 22
-S22D1$immediate_action = "Nothing"
-S22D1$recent_action = "Nothing"
-
-S22D3$time..s. = hms(substr(S22D3$time..s., 12, 19))
-S22D3$day = 3
-S22D3$permutation = 1
-S22D3$session = 22
-S22D3$immediate_action = "Nothing"
-S22D3$recent_action = "Nothing"
-
-S22D2$time..s. = hms(substr(S22D2$time..s., 12, 19))
-S22D2$day = 2
-S22D2$permutation = 1
-S22D2$session = 22
-S22D2$immediate_action = ifelse(
-  hms("09:00:00") <= S22D2$time..s. & 
-    hms("10:00:00") >= S22D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S22D2$time..s. & 
-      hms("16:00:00") >= S22D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S22D2$time..s. & 
-        hms("23:59:59") >= S22D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S22D2$recent_action = ifelse(
-  hms("09:00:00") <= S22D2$time..s. & 
-    hms("14:59:59") >= S22D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S22D2$time..s. & 
-      hms("22:59:59") >= S22D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S22D2$time..s. & 
-        hms("23:59:59") >= S22D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S22D1, S22D2, S22D3)
-
-S23D1 = read.csv("data/S23D1.csv")
-S23D2 = read.csv("data/S23D2.csv")
-S23D3 = read.csv("data/S23D3.csv")
-
-
-S23D1$time..s. = hms(substr(S23D1$time..s., 12, 19))
-S23D1$day = 1
-S23D1$permutation = 2
-S23D1$session = 23
-S23D1$immediate_action = "Nothing"
-S23D1$recent_action = "Nothing"
-
-S23D3$time..s. = hms(substr(S23D3$time..s., 12, 19))
-S23D3$day = 3
-S23D3$permutation = 2
-S23D3$session = 23
-S23D3$immediate_action = "Nothing"
-S23D3$recent_action = "Nothing"
-
-S23D2$time..s. = hms(substr(S23D2$time..s., 12, 19))
-S23D2$day = 2
-S23D2$permutation = 2
-S23D2$session = 23
-S23D2$immediate_action = ifelse(
-  hms("09:00:00") <= S23D2$time..s. & 
-    hms("10:00:00") >= S23D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S23D2$time..s. & 
-      hms("16:00:00") >= S23D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S23D2$time..s. & 
-        hms("23:59:59") >= S23D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S23D2$recent_action = ifelse(
-  hms("09:00:00") <= S23D2$time..s. & 
-    hms("14:59:59") >= S23D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S23D2$time..s. & 
-      hms("22:59:59") >= S23D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S23D2$time..s. & 
-        hms("23:59:59") >= S23D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S23D1, S23D2, S23D3)
-
-
-S24D1 = read.csv("data/S24D1.csv")
-S24D2 = read.csv("data/S24D2.csv")
-S24D3 = read.csv("data/S24D3.csv")
-
-
-S24D1$time..s. = hms(substr(S24D1$time..s., 12, 19))
-S24D1$day = 1
-S24D1$permutation = 3
-S24D1$session = 24
-S24D1$immediate_action = "Nothing"
-S24D1$recent_action = "Nothing"
-
-S24D3$time..s. = hms(substr(S24D3$time..s., 12, 19))
-S24D3$day = 3
-S24D3$permutation = 3
-S24D3$session = 24
-S24D3$immediate_action = "Nothing"
-S24D3$recent_action = "Nothing"
-
-S24D2$time..s. = hms(substr(S24D2$time..s., 12, 19))
-S24D2$day = 2
-S24D2$permutation = 3
-S24D2$session = 24
-S24D2$immediate_action = ifelse(
-  hms("09:00:00") <= S24D2$time..s. & 
-    hms("10:00:00") >= S24D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S24D2$time..s. & 
-      hms("16:00:00") >= S24D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S24D2$time..s. & 
-        hms("23:59:59") >= S24D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S24D2$recent_action = ifelse(
-  hms("09:00:00") <= S24D2$time..s. & 
-    hms("14:59:59") >= S24D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S24D2$time..s. & 
-      hms("22:59:59") >= S24D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S24D2$time..s. & 
-        hms("23:59:59") >= S24D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S24D1, S24D2, S24D3)
-
-
-
-S25D1 = read.csv("data/S25D1.csv")
-S25D2 = read.csv("data/S25D2.csv")
-S25D3 = read.csv("data/S25D3.csv")
-
-
-S25D1$time..s. = hms(substr(S25D1$time..s., 12, 19))
-S25D1$day = 1
-S25D1$permutation = 1
-S25D1$session = 25
-S25D1$immediate_action = "Nothing"
-S25D1$recent_action = "Nothing"
-
-S25D3$time..s. = hms(substr(S25D3$time..s., 12, 19))
-S25D3$day = 3
-S25D3$permutation = 1
-S25D3$session = 25
-S25D3$immediate_action = "Nothing"
-S25D3$recent_action = "Nothing"
-
-S25D2$time..s. = hms(substr(S25D2$time..s., 12, 19))
-S25D2$day = 2
-S25D2$permutation = 1
-S25D2$session = 25
-S25D2$immediate_action = ifelse(
-  hms("09:00:00") <= S25D2$time..s. & 
-    hms("10:00:00") >= S25D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S25D2$time..s. & 
-      hms("16:00:00") >= S25D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S25D2$time..s. & 
-        hms("23:59:59") >= S25D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S25D2$recent_action = ifelse(
-  hms("09:00:00") <= S25D2$time..s. & 
-    hms("14:59:59") >= S25D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S25D2$time..s. & 
-      hms("22:59:59") >= S25D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S25D2$time..s. & 
-        hms("23:59:59") >= S25D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S25D1, S25D2, S25D3)
-
-
-
-
-
-S26D1 = read.csv("data/S26D1.csv")
-S26D2 = read.csv("data/S26D2.csv")
-S26D3 = read.csv("data/S26D3.csv")
-
-
-S26D1$time..s. = hms(substr(S26D1$time..s., 12, 19))
-S26D1$day = 1
-S26D1$permutation = 3
-S26D1$session = 26
-S26D1$immediate_action = "Nothing"
-S26D1$recent_action = "Nothing"
-
-S26D3$time..s. = hms(substr(S26D3$time..s., 12, 19))
-S26D3$day = 3
-S26D3$permutation = 3
-S26D3$session = 26
-S26D3$immediate_action = "Nothing"
-S26D3$recent_action = "Nothing"
-
-S26D2$time..s. = hms(substr(S26D2$time..s., 12, 19))
-S26D2$day = 2
-S26D2$permutation = 3
-S26D2$session = 26
-S26D2$immediate_action = ifelse(
-  hms("09:00:00") <= S26D2$time..s. & 
-    hms("10:00:00") >= S26D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S26D2$time..s. & 
-      hms("16:00:00") >= S26D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S26D2$time..s. & 
-        hms("23:59:59") >= S26D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S26D2$recent_action = ifelse(
-  hms("09:00:00") <= S26D2$time..s. & 
-    hms("14:59:59") >= S26D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S26D2$time..s. & 
-      hms("22:59:59") >= S26D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S26D2$time..s. & 
-        hms("23:59:59") >= S26D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S26D1, S26D2, S26D3)
-
-
-
-
-S27D1 = read.csv("data/S27D1.csv")
-S27D2 = read.csv("data/S27D2.csv")
-S27D3 = read.csv("data/S27D3.csv")
-
-
-S27D1$time..s. = hms(substr(S27D1$time..s., 12, 19))
-S27D1$day = 1
-S27D1$permutation = 2
-S27D1$session = 24
-S27D1$immediate_action = "Nothing"
-S27D1$recent_action = "Nothing"
-
-S27D3$time..s. = hms(substr(S27D3$time..s., 12, 19))
-S27D3$day = 3
-S27D3$permutation = 2
-S27D3$session = 27
-S27D3$immediate_action = "Nothing"
-S27D3$recent_action = "Nothing"
-
-S27D2$time..s. = hms(substr(S27D2$time..s., 12, 19))
-S27D2$day = 2
-S27D2$permutation = 2
-S27D2$session = 27
-S27D2$immediate_action = ifelse(
-  hms("09:00:00") <= S27D2$time..s. & 
-    hms("10:00:00") >= S27D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S27D2$time..s. & 
-      hms("16:00:00") >= S27D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S27D2$time..s. & 
-        hms("23:59:59") >= S27D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S27D2$recent_action = ifelse(
-  hms("09:00:00") <= S27D2$time..s. & 
-    hms("14:59:59") >= S27D2$time..s. ,
-  "Reading",
-  
-  ifelse(
-    hms("15:00:00") <= S27D2$time..s. & 
-      hms("22:59:59") >= S27D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S27D2$time..s. & 
-        hms("23:59:59") >= S27D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S27D1, S27D2, S27D3)
-
-
-
-
-
-
-S28D1 = read.csv("data/S28D1.csv")
-S28D2 = read.csv("data/S28D2.csv")
-S28D3 = read.csv("data/S28D3.csv")
-
-
-S28D1$time..s. = hms(substr(S28D1$time..s., 12, 19))
-S28D1$day = 1
-S28D1$permutation = 1
-S28D1$session = 28
-S28D1$immediate_action = "Nothing"
-S28D1$recent_action = "Nothing"
-
-S28D3$time..s. = hms(substr(S28D3$time..s., 12, 19))
-S28D3$day = 3
-S28D3$permutation = 1
-S28D3$session = 28
-S28D3$immediate_action = "Nothing"
-S28D3$recent_action = "Nothing"
-
-S28D2$time..s. = hms(substr(S28D2$time..s., 12, 19))
-S28D2$day = 2
-S28D2$permutation = 1
-S28D2$session = 28
-S28D2$immediate_action = ifelse(
-  hms("09:00:00") <= S28D2$time..s. & 
-    hms("10:00:00") >= S28D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S28D2$time..s. & 
-      hms("16:00:00") >= S28D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S28D2$time..s. & 
-        hms("23:59:59") >= S28D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-S28D2$recent_action = ifelse(
-  hms("09:00:00") <= S28D2$time..s. & 
-    hms("14:59:59") >= S28D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S28D2$time..s. & 
-      hms("22:59:59") >= S28D2$time..s. ,
-    "Aerobic Exercise",
-    
-    ifelse(
-      hms("23:00:00") <= S28D2$time..s. & 
-        hms("23:59:59") >= S28D2$time..s. ,
-      "Sugar",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S28D1, S28D2, S28D3)
-
-
-
-S29D1 = read.csv("data/S29D1.csv")
-S29D2 = read.csv("data/S29D2.csv")
-S29D3 = read.csv("data/S29D3.csv")
-
-
-S29D1$time..s. = hms(substr(S29D1$time..s., 12, 19))
-S29D1$day = 1
-S29D1$permutation = 3
-S29D1$session = 29
-S29D1$immediate_action = "Nothing"
-S29D1$recent_action = "Nothing"
-
-S29D3$time..s. = hms(substr(S29D3$time..s., 12, 19))
-S29D3$day = 3
-S29D3$permutation = 3
-S29D3$session = 29
-S29D3$immediate_action = "Nothing"
-S29D3$recent_action = "Nothing"
-
-S29D2$time..s. = hms(substr(S29D2$time..s., 12, 19))
-S29D2$day = 2
-S29D2$permutation = 3
-S29D2$session = 29
-S29D2$immediate_action = ifelse(
-  hms("09:00:00") <= S29D2$time..s. & 
-    hms("10:00:00") >= S29D2$time..s. ,
-  "TV",                                                  #kevin wuz here
-  
-  ifelse(
-    hms("15:00:00") <= S29D2$time..s. & 
-      hms("16:00:00") >= S29D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S29D2$time..s. & 
-        hms("23:59:59") >= S29D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-S29D2$recent_action = ifelse(
-  hms("09:00:00") <= S29D2$time..s. & 
-    hms("14:59:59") >= S29D2$time..s. ,
-  "TV",
-  
-  ifelse(
-    hms("15:00:00") <= S29D2$time..s. & 
-      hms("22:59:59") >= S29D2$time..s. ,
-    "Nothing",
-    
-    ifelse(
-      hms("23:00:00") <= S29D2$time..s. & 
-        hms("23:59:59") >= S29D2$time..s. ,
-      "Nothing",
-      "Nothing"
-    )
-  )
-)
-
-df = rbind(df, S29D1, S29D2, S29D3)
-
+  if (is.na(df)){
+    df = tmp
+  } else {
+    df = rbind(df, tmp)
+  }
+}
 
 
 ################### manual IR inclusion
@@ -3543,20 +2026,6 @@ df$BPD[df$session == 29 & df$day == 3] = 66
 
 
 
-
-
-
-
-
-
-
-
-
-#### bruh 83 csvs, could this not have been formatted to be 
-#### reasonable to automate???????? 
-
-
-
 ###### modeling
 
 #head(df)
@@ -3576,29 +2045,9 @@ names(df2)[names(df2) == "breathing_rate..rpm....api.datatype.33.." ] = "Breathi
 names(df2)[names(df2) == "cadence..spm....api.datatype.53..cadence..spm....api.datatype.53.." ] = "cadence"
 summary(df2)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### how 2 melt your RAM 101
 library(glmnet)
+
 ### stroop
 x <- model.matrix(lm(stroop~permutation+immediate_action+recent_action+
                        BPS+BPD+HR+Breathing_Rate+cadence, df2))[,-1]
