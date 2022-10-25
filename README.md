@@ -10,7 +10,7 @@ Full details of the 2021 problem and dataset can be found in the [competition_de
 
 [Full report viewable here.](https://github.com/QueekCode/Octagoons/blob/main/Final_Report.pdf)
 
-[Data cleaning and modelling scripts viewable here.](https://github.com/QueekCode/Octagoons/blob/main/Octagoons.R).
+[Data cleaning and modelling scripts viewable here.](https://github.com/QueekCode/Octagoons/blob/main/Octagoons.R)
 
 <br>
 
