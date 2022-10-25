@@ -10,6 +10,7 @@ Details of the 2021 problem and dataset can be found in the [competition_details
 
 [Data cleaning and modelling scripts viewable here.](https://github.com/QueekCode/Octagoons/blob/main/Octagoons.R).
 
+<br>
 
 **Members of team Octagoons:**
 
